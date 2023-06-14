@@ -20,5 +20,13 @@
     "pool": "^0.4.1",
     "sequelize": "^6.32.0",
     "socket.io": "^4.6.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TulsiHudka/demo-connection.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TulsiHudka/demo-connection/issues"
+  },
+  "homepage": "https://github.com/TulsiHudka/demo-connection#readme"
 }

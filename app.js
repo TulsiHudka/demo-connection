@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const port = 8000;
+// const port = 8000;
 
 const http = require('http');
 const socketIO = require('socket.io');
@@ -18,42 +18,42 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 
-// const server = http.createServer(app);
-// const io = socketIO(server, {
-//     cors: {
-//         origin: "http://localhost:3000",
-//         methods: ["GET", "POST", "DELETE"]
-//     }
-// });
+const server = http.createServer(app);
+const io = socketIO(server, {
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST", "DELETE"]
+    }
+});
 
-// io.on('connection', (socket) => {
-//     console.log('Client connected:', socket.id);
+io.on('connection', (socket) => {
+    console.log('Client connected:', socket.id);
 
-//     // Notify all clients when users data is updated
-//     const notifyUsersUpdated = () => {
-//         io.emit('usersUpdated');
-//     };
+    // Notify all clients when users data is updated
+    const notifyUsersUpdated = () => {
+        io.emit('usersUpdated');
+    };
 
-//     socket.on('disconnect', () => {
-//         console.log('Client disconnected:', socket.id);
-//     });
+    socket.on('disconnect', () => {
+        console.log('Client disconnected:', socket.id);
+    });
 
-//     // Emit a notification to the client
-//     const notification = { message: 'New notification' };
-//     socket.emit('notification', notification);
-// });
+    // Emit a notification to the client
+    const notification = { message: 'New notification' };
+    socket.emit('notification', notification);
+});
 
 app.use(express.json());
 
-// app.get('/api/getusers', async (req, res) => {
-//     try {
-//         const { rows } = await pool.query('SELECT * FROM users');
-//         res.json(rows);
-//     } catch (error) {
-//         console.error('Error fetching users:', error);
-//         res.status(500).json({ error: 'Internal Server Error' });
-//     }
-// });
+app.get('/api/getusers', async (req, res) => {
+    try {
+        const { rows } = await pool.query('SELECT * FROM users');
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 // app.post('/api/users', async (req, res) => {
 //     const { name, email } = req.body;
@@ -82,6 +82,6 @@ app.use(express.json());
 //     }
 // });
 
-app.listen(port, () => {
-    console.log(`WebSocket server is running on ${port}`);
+app.listen(8000, () => {
+    console.log(`WebSocket server is running on 8000`);
 });
