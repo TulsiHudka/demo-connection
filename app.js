@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
-// const port = 8000;
+const axios = require("axios")
+const port = 8000;
 
 const http = require('http');
 const socketIO = require('socket.io');
@@ -9,7 +10,9 @@ const cors = require('cors')
 
 const bodyParser = require("body-parser");
 
-const sequelize = require("./src/db/conn")
+// const sequelize = require("./src/db/conn")
+
+const userRouter = require("./routers/userRoutes")
 
 app.use(cors({
     origin: 'http://localhost:3000',
@@ -28,60 +31,38 @@ const io = socketIO(server, {
 
 io.on('connection', (socket) => {
     console.log('Client connected:', socket.id);
+    socket.on('apiRequest', async (data, callback) => {
+        try {
+            callback("processing")
 
-    // Notify all clients when users data is updated
-    const notifyUsersUpdated = () => {
-        io.emit('usersUpdated');
-    };
+            const response = await someAsyncAPIFunction();
 
+            socket.emit('response', response);
+
+        } catch (error) {
+            console.error('API request failed:', error);
+        }
+    })
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id);
     });
-
-    // Emit a notification to the client
-    const notification = { message: 'New notification' };
-    socket.emit('notification', notification);
 });
 
 app.use(express.json());
+app.use("/api", userRouter)
 
-app.get('/api/getusers', async (req, res) => {
-    try {
-        const { rows } = await pool.query('SELECT * FROM users');
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching users:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+server.listen(port, () => {
+    console.log(`WebSocket server is running on ${port}`);
 });
 
-// app.post('/api/users', async (req, res) => {
-//     const { name, email } = req.body;
-
-//     try {
-//         await pool.query('INSERT INTO users ( name, email) VALUES ($1, $2)', [name, email]);
-//         io.emit('usersUpdated'); // Notify all clients about the update
-//         res.sendStatus(201);
-//     } catch (error) {
-//         console.error('Error creating user:', error);
-//         res.status(500).json({ error: 'Internal Server Error' });
-//     }
-// });
-
-// app.delete('/api/users/:id', async (req, res) => {
-//     const id = req.params.id;
-//     console.log(id);
-
-//     try {
-//         await pool.query('DELETE FROM users WHERE id = $1', [id]);
-//         io.emit('usersUpdated'); // Notify all clients about the update
-//         res.sendStatus(200);
-//     } catch (error) {
-//         console.error('Error deleting user:', error);
-//         res.status(500).json({ error: 'Internal Server Error' });
-//     }
-// });
-
-app.listen(8000, () => {
-    console.log(`WebSocket server is running on 8000`);
-});
+async function someAsyncAPIFunction() {
+    return new Promise((resolve, reject) => {
+        axios.get('http://192.168.2.71:9191/customers/stream')
+            .then(response => {
+                resolve(response.data);
+            })
+            .catch(error => {
+                reject(error);
+            });
+    });
+}
